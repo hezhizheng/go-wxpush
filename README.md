@@ -1,6 +1,6 @@
 # Go-WXPush - 微信消息推送服务 (基于golang)
 
-这是一个基于 golang 开发的微信测试公众号模板消息推送服务。它提供了一个简单的 API 接口，让您可以轻松地通过 HTTP 请求将消息推送到指定的微信用户。感谢[frankiejun/wxpushSkin](https://github.com/frankiejun/wxpushSkin)
+这是一个基于 golang 开发的微信测试公众号模板消息推送服务。它提供了一个简单的 API 接口，让您可以轻松地通过 HTTP 请求将消息推送到指定的微信用户。感谢[frankiejun/wxpushSkin](https://github.com/frankiejun/wxpush)
 
 <p align="center">
 <img src="./img/logo.png">
