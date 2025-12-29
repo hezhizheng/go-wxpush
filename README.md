@@ -188,3 +188,6 @@ curl --location --request POST 'http://127.0.0.1:5566/wxsend' \
 ## 📜 许可证
 
 本项目采用 [MIT License](./LICENSE.txt) 开源许可证。
+
+## 赞助
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
