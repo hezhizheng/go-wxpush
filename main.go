@@ -277,7 +277,7 @@ func sendTemplateMessage(accessToken string, params RequestParams) (WechatAPIRes
 	// 处理时区，默认东八区
 	location, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
-		location, _ = time.LoadLocation("Asia/Shanghai") // 确保默认使用东八区
+		location = time.FixedZone("CST", 8*60*60) // 确保默认使用东八区
 	}
 
 	// 如果参数中有时区，则尝试使用该时区
