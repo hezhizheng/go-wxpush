@@ -6,29 +6,29 @@ FROM golang:1.21-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 1. 预下载依赖 (利用 Docker 缓存层加速构建)
-COPY go.mod go.sum ./
-# 如果在 Github Actions 里跑，不需要设置 GOPROXY，如果在国内本地跑需解开下面注释
-# RUN go env -w GOPROXY=https://goproxy.cn,direct
-RUN go mod download
+# --- 修复点开始 ---
+# 1. 原来是 COPY go.mod go.sum ./ 
+# 改为只复制 go.mod (因为你没有 go.sum)
+COPY go.mod ./
 
-# 2. 拷贝源码
+# 2. 下载依赖
+# 即使没有 go.sum，go mod download 也会尝试根据 go.mod 下载依赖
+RUN go mod download
+# --- 修复点结束 ---
+
+# 3. 拷贝源码
 COPY . .
 
-# 3. 编译
-# CGO_ENABLED=0: 禁用 CGO，确保生成静态链接的二进制文件
-# -ldflags="-s -w": 去除调试信息，减小体积
-# -o go-wxpush: 输出文件名为 go-wxpush (不再带架构后缀)
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o go-wxpush .
+# 4. 编译
+# 补充：为了防止缺少 go.sum 导致构建不稳定，这里加一个 go mod tidy 自动整理依赖
+RUN go mod tidy && CGO_ENABLED=0 go build -ldflags="-s -w" -o go-wxpush .
 
 # ===========================
 # 第二阶段：运行 (Runner)
 # ===========================
 FROM alpine:latest
 
-# 安装必要的依赖
-# ca-certificates: 访问 HTTPS 接口(微信API)必须的根证书
-# tzdata: 支持 -tz 参数设置时区
+# 安装基础依赖
 RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /app
@@ -42,7 +42,7 @@ RUN chmod +x ./go-wxpush
 # 设置入口点
 ENTRYPOINT ["./go-wxpush"]
 
-# 恢复你原来的默认参数 (注意：二进制文件名已统一，这里只写参数)
+# 默认参数
 CMD ["-port", "5566", \
      "-appid", "", \
      "-secret", "", \
