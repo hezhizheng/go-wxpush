@@ -1,9 +1,14 @@
-name: Build arm64 Image
+name: Build arm64 Image to GHCR
 
 on:
   push:
-    branches: [ "master" ]
-  workflow_dispatch: # 允许手动触发
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# 关键点1：必须配置写权限，否则无法上传镜像
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -18,16 +23,23 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      # 关键点2：登录到 ghcr.io
+      # 使用 github.actor (你的用户名) 和 secrets.GITHUB_TOKEN (自动生成的临时密钥)
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 关键点3：修改 tag 前缀为 ghcr.io
+      # 注意：ghcr.io 要求所有的名称必须是【小写】。
+      # 如果你的 GitHub 用户名包含大写字母，请手动在这里写成小写，不要用变量。
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64 # 这里指定构建双架构
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: zxxx98/go-wxpush:latest
+          # 格式：ghcr.io/你的用户名/镜像名:版本
+          tags: ghcr.io/${{ github.repository_owner }}/go-wxpush:latest
