@@ -190,6 +190,10 @@ curl --location --request POST 'http://127.0.0.1:5566/wxsend' \
 
 欢迎任何形式的贡献！如果您有好的想法或发现了 Bug，请随时提交 Pull Request 或创建 Issue。
 
+## 💬 相关项目
+
+[gotify的微信消息服务](https://github.com/Wuqiyang312/gotify-wechat-plugin)
+
 ## 📜 许可证
 
 本项目采用 [MIT License](./LICENSE.txt) 开源许可证。
