@@ -24,6 +24,7 @@ type RequestParams struct {
 	TemplateID string `json:"template_id" form:"template_id"`
 	BaseURL    string `json:"base_url" form:"base_url"`
 	Timezone   string `json:"tz" form:"tz"`
+	DetailURL  string `json:"detail_url" form:"detail_url"`
 }
 
 // 全局变量用于存储命令行参数
@@ -37,6 +38,7 @@ var (
 	cliBaseURL    string
 	startPort     string
 	cliTimezone   string
+	cliDetailURL  string
 )
 
 // 微信AccessToken响应
@@ -69,6 +71,7 @@ func main() {
 	flag.StringVar(&cliTemplateID, "template_id", "", "模板ID")
 	flag.StringVar(&cliBaseURL, "base_url", "", "跳转url")
 	flag.StringVar(&cliTimezone, "tz", "Asia/Shanghai", "时区，默认东八区")
+	flag.StringVar(&cliDetailURL, "detail_url", "", "详情页跳转链接")
 	flag.StringVar(&startPort, "port", "", "端口")
 
 	// 解析命令行参数
@@ -145,6 +148,7 @@ func handleWxSend(w http.ResponseWriter, r *http.Request) {
 		params.TemplateID = r.URL.Query().Get("template_id")
 		params.BaseURL = r.URL.Query().Get("base_url")
 		params.Timezone = r.URL.Query().Get("tz")
+		params.DetailURL = r.URL.Query().Get("detail_url")
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprintf(w, `{"error": "Method not allowed"}`)
@@ -175,6 +179,9 @@ func handleWxSend(w http.ResponseWriter, r *http.Request) {
 	}
 	if params.Timezone == "" && cliTimezone != "" {
 		params.Timezone = cliTimezone
+	}
+	if params.DetailURL == "" && cliDetailURL != "" {
+		params.DetailURL = cliDetailURL
 	}
 
 	// 验证必要参数
@@ -294,10 +301,17 @@ func sendTemplateMessage(accessToken string, params RequestParams) (WechatAPIRes
 	timeStr := currentTime.Format("2006-01-02 15:04:05")
 
 	// 构建请求数据
+	var targetURL string
+	if params.DetailURL != "" {
+		targetURL = params.DetailURL
+	} else {
+		targetURL = params.BaseURL + `/detail?title=` + url.QueryEscape(params.Title) + `&message=` + url.QueryEscape(params.Content) + `&date=` + url.QueryEscape(timeStr)
+	}
+
 	requestData := TemplateMessageRequest{
 		ToUser:     params.UserID,
 		TemplateID: params.TemplateID,
-		URL:        params.BaseURL + `/detail?title=` + url.QueryEscape(params.Title) + `&message=` + url.QueryEscape(params.Content) + `&date=` + url.QueryEscape(timeStr),
+		URL:        targetURL,
 		Data: map[string]interface{}{
 			"title": map[string]string{
 				"value": params.Title,
