@@ -46,6 +46,8 @@ var (
 type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
+	Errcode     int    `json:"errcode"`
+	Errmsg      string `json:"errmsg"`
 }
 
 // 微信模板消息请求
@@ -274,6 +276,10 @@ func getAccessToken(appid, secret string) (string, error) {
 
 	if err != nil {
 		return "", err
+	}
+
+	if tokenResp.Errcode != 0 {
+		return "", fmt.Errorf("wechat API error: errcode=%d, errmsg=%s", tokenResp.Errcode, tokenResp.Errmsg)
 	}
 
 	return tokenResp.AccessToken, nil
