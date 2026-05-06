@@ -16,15 +16,16 @@ import (
 
 // 请求参数结构体
 type RequestParams struct {
-	Title      string `json:"title" form:"title"`
-	Content    string `json:"content" form:"content"`
-	AppID      string `json:"appid" form:"appid"`
-	Secret     string `json:"secret" form:"secret"`
-	UserID     string `json:"userid" form:"userid"`
-	TemplateID string `json:"template_id" form:"template_id"`
-	BaseURL    string `json:"base_url" form:"base_url"`
-	Timezone   string `json:"tz" form:"tz"`
-	DetailURL  string `json:"detail_url" form:"detail_url"`
+	Title      string                 `json:"title" form:"title"`
+	Content    string                 `json:"content" form:"content"`
+	AppID      string                 `json:"appid" form:"appid"`
+	Secret     string                 `json:"secret" form:"secret"`
+	UserID     string                 `json:"userid" form:"userid"`
+	TemplateID string                 `json:"template_id" form:"template_id"`
+	BaseURL    string                 `json:"base_url" form:"base_url"`
+	Timezone   string                 `json:"tz" form:"tz"`
+	DetailURL  string                 `json:"detail_url" form:"detail_url"`
+	Data       map[string]interface{} `json:"data" form:"data"`
 }
 
 // 全局变量用于存储命令行参数
@@ -308,18 +309,28 @@ func sendTemplateMessage(accessToken string, params RequestParams) (WechatAPIRes
 		targetURL = params.BaseURL + `/detail?title=` + url.QueryEscape(params.Title) + `&message=` + url.QueryEscape(params.Content) + `&date=` + url.QueryEscape(timeStr)
 	}
 
-	requestData := TemplateMessageRequest{
-		ToUser:     params.UserID,
-		TemplateID: params.TemplateID,
-		URL:        targetURL,
-		Data: map[string]interface{}{
+	var msgData map[string]interface{}
+	if params.Data != nil && len(params.Data) > 0 {
+		msgData = make(map[string]interface{})
+		for k, v := range params.Data {
+			msgData[k] = map[string]interface{}{"value": v}
+		}
+	} else {
+		msgData = map[string]interface{}{
 			"title": map[string]string{
 				"value": params.Title,
 			},
 			"content": map[string]string{
 				"value": params.Content,
 			},
-		},
+		}
+	}
+
+	requestData := TemplateMessageRequest{
+		ToUser:     params.UserID,
+		TemplateID: params.TemplateID,
+		URL:        targetURL,
+		Data:       msgData,
 	}
 
 	// 转换为JSON
