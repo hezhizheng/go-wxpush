@@ -42,8 +42,8 @@
 ### [下载编译好的文件启动](https://github.com/hezhizheng/go-wxpush/releases/)
 
 - 启动参数
-    * 命令行启动参数(可不加，启动之后直接在url上拼接参数也可)  `./go-wxpush_windows_amd64.exe -port "5566" -title "测试标题" -content "测试内容" -appid "xxx" -secret "xxx" -userid "xxx-k08" -template_id "xxx-Ks_PwGm--GSzllU" -base_url "https://push.hzz.cool"`
-    *  url请求参数(get)  `与命令行参数名称一致` `/wxsend?appid=xxx&secret=xxx&userid=xxx-k08&template_id=xxx-Ks_PwGm--GSzllU&base_url=https://push.hzz.cool&content=保持微笑，代码无 bug！`
+    * 命令行启动参数(可不加，启动之后直接在url上拼接参数也可)  `./go-wxpush_windows_amd64.exe -port "5566" -title "测试标题" -content "测试内容" -appid "xxx" -secret "xxx" -userid "xxx-k08" -template_id "xxx-Ks_PwGm--GSzllU" -base_url "https://push.hzzio.top"`
+    *  url请求参数(get)  `与命令行参数名称一致` `/wxsend?appid=xxx&secret=xxx&userid=xxx-k08&template_id=xxx-Ks_PwGm--GSzllU&base_url=https://push.hzzio.top&content=保持微笑，代码无 bug！`
 
 ### 自行编译可执行文件(跨平台)
 
